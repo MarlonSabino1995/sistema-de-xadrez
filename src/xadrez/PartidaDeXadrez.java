@@ -1,5 +1,8 @@
 package xadrez;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jogoDeTabuleiro.Peca;
 import jogoDeTabuleiro.Posicao;
 import jogoDeTabuleiro.Tabuleiro;
@@ -9,22 +12,28 @@ import xadrez.pecas.Torre;
 public class PartidaDeXadrez {
 
 	private Tabuleiro tabuleiro;
+	private int jogadorDaVez;
+	private Cor jogadorAtual;
 	
+	private List<Peca> pecaNoTabuleiro = new ArrayList<>();
+	private List<Peca> pecasCapturadas = new ArrayList<>();
 	
-	/* O tabuleiro tem uma matriz de peças, quem tem que saber a dimensão do 
-	do xandrez é a classe partidaDeXadres*/
-	
+
 	public PartidaDeXadrez() {
 		tabuleiro = new Tabuleiro(8, 8);
+		jogadorDaVez = 1;
+		jogadorAtual = Cor.BRANCO;
 		configuracaoInicial();
 	}
-	 
-	/*
-	 Irá retornar uma matriz de PecaXadrez correspondente a essa partida,
-	 porque estou na camada de xadrez 	 para o programa eu não quero 
-	 liberar as peças do tipo Peca mas sim, PecaXadrez porque estou 
-	 desenvolvendo em camadas
-	 */
+	
+	public int getJogadorDaVez() {
+		return jogadorDaVez;
+	}
+	
+	public Cor getJogadorAtual() {
+		return jogadorAtual;
+	}
+	
 	public PecaXadrez[][] getPecas(){
 		PecaXadrez[][] peca = new PecaXadrez[tabuleiro.getLinhas()][tabuleiro.getColunas()];
 		for(int i =0; i < tabuleiro.getLinhas(); i++) {
@@ -47,6 +56,7 @@ public class PartidaDeXadrez {
 		validarPosicaoDeOrigem(source);
 		validarPosicaoDeDestino(source,target);
 		Peca capturaDePeca = facaMovimento(source, target);
+		nextJogadorDaVez();
 		return (PecaXadrez )capturaDePeca;
 	}
 	
@@ -54,9 +64,14 @@ public class PartidaDeXadrez {
 		if(!tabuleiro.existePosicao(posicao)) {
 			throw new XadrezException("Não existe peça na posicao de origem !");
 		}
+		if(jogadorAtual != ((PecaXadrez)tabuleiro.peca(posicao)).getCor()) {
+			throw new XadrezException("A peça escolhida não é sua !");
+		}
+		
 		if(!tabuleiro.peca(posicao).existeAlgumaMovimentacaoPossivel()) {
 			throw new XadrezException("Não existe movimentos possivel para a peça escolhida !");
 		}
+	
 	}
 	
 	private void validarPosicaoDeDestino(Posicao origem, Posicao destino) {
@@ -65,15 +80,27 @@ public class PartidaDeXadrez {
 		}
 	}
 	
+	private void nextJogadorDaVez() {
+		jogadorDaVez++;
+		jogadorAtual = (jogadorAtual == Cor.BRANCO) ? Cor.PRETO : Cor.BRANCO;
+	}
+	
 	private Peca facaMovimento(Posicao origem, Posicao destino) {
 		Peca p = tabuleiro.removerPeca(origem);
-		Peca pecaCapturada = tabuleiro.removerPeca(destino); 
+		Peca pecaCapturada = tabuleiro.removerPeca(destino);
 		tabuleiro.lugarDaPeca(p, destino);
+		
+		if(pecaCapturada != null) {
+			pecaNoTabuleiro.remove(pecaCapturada);
+			pecasCapturadas.add(pecaCapturada);
+		}
+		
 		return pecaCapturada;
 	}
 	
 	private void colocarNovaPeca(char coluna, int linha, PecaXadrez peca) {
 		tabuleiro.lugarDaPeca(peca, new PosicaoXadrez(coluna, linha).posicionar());
+		pecaNoTabuleiro.add(peca);
 	}
 	
 	
