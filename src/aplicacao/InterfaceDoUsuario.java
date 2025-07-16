@@ -54,6 +54,10 @@ public class InterfaceDoUsuario {
 		
 		System.out.println("Jogador da vez: "+ partida.getJogadorDaVez());
 		System.out.println("Esperando o jogador: "+ partida.getJogadorAtual());
+		
+		if(partida.getCheck()) {
+			System.out.println("Check! ");
+		}
 	}
 	
 	
