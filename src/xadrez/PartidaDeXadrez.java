@@ -18,6 +18,8 @@ public class PartidaDeXadrez {
 	
 	private boolean check;
 	
+	private boolean checkMate;
+	
 	private List<Peca> pecaNoTabuleiro = new ArrayList<>();
 	private List<Peca> pecasCapturadas = new ArrayList<>();
 	
@@ -39,6 +41,10 @@ public class PartidaDeXadrez {
 	
 	public boolean getCheck() {
 		return check;
+	}
+	
+	public boolean getCheckMate() {
+		return checkMate;
 	}
 	
 	public PecaXadrez[][] getPecas(){
@@ -71,7 +77,12 @@ public class PartidaDeXadrez {
 		
 		check = (testCheck(oponente(jogadorAtual)))?true : false;
 		
-		nextJogadorDaVez();
+		if(testCheckMate(oponente(jogadorAtual))) {
+			checkMate = true;
+		}else {
+			nextJogadorDaVez();
+		}
+		
 		return (PecaXadrez )capturaDePeca;
 	}
 	
@@ -138,6 +149,31 @@ public class PartidaDeXadrez {
 			}
 		}
 		throw new IllegalStateException("Não há rei "+cor+" no tabuleiro. ");
+	}
+	
+	private boolean testCheckMate(Cor cor) {
+		if(! testCheck(cor)) {
+			return false;
+		}
+		List<Peca> list = pecaNoTabuleiro.stream().filter(x -> ((PecaXadrez)x).getCor() == cor).collect(Collectors.toList());
+		for(Peca p : list) {
+			boolean [][] mat = p.movimentosPossiveis();
+			for(int i = 0; i < tabuleiro.getLinhas(); i++) {
+				for(int j = 0; j<tabuleiro.getColunas();j++) {
+					if(mat[i][j]) {
+						Posicao origem = ((PecaXadrez)p).getPosicaoXadrez().posicionar();
+						Posicao destino = new Posicao(i, j);
+						Peca pecaCapturada = facaMovimento(origem, destino);
+						boolean testCheck = testCheck(cor);
+						desfazerMovimento(origem, destino, pecaCapturada);
+						if(!testCheck) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
 	}
 	
 	private boolean testCheck (Cor cor) {
