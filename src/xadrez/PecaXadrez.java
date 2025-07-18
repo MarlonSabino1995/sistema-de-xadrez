@@ -8,7 +8,7 @@ public abstract class PecaXadrez extends Peca{
 
 	private Cor cor;
 	
-	private int contaemDeMovimento;
+	private int contagemDeMovimento;
 	
 	public PecaXadrez(Tabuleiro tabuleiro, Cor cor) {
 		super(tabuleiro);
@@ -18,7 +18,19 @@ public abstract class PecaXadrez extends Peca{
 	public Cor getCor() {
 		return cor;
 	}
-	 
+	
+	public int getContagemDeMovimento() {
+		return contagemDeMovimento;
+	}
+	
+	public void incrementContagem() {
+		contagemDeMovimento++;
+	}
+	
+	public void decrementContagem() {
+		contagemDeMovimento--;
+	}
+	
 	public PosicaoXadrez getPosicaoXadrez() {
 		return PosicaoXadrez.daPosicao(posicao);
 	}
