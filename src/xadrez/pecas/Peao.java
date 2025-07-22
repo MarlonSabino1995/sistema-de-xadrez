@@ -57,7 +57,7 @@ public class Peao extends PecaXadrez{
 		}
 		
 		
-		return null;
+		return mat;
 	}
 
 	@Override
